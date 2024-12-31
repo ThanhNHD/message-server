@@ -66,9 +66,9 @@ public class ScheduledRequestSender {
         List<IncomingRequest> unsentRequest = requestService.getUnsentRequest();
         if (!unsentRequest.isEmpty()) {
             for (IncomingRequest incomingRequest : unsentRequest) {
-                if (requestService.getRequestPassLimit(incomingRequest.getDeviceId())) {
+                if (requestService.getRequestPassLimit(incomingRequest.getSourcePlace())) {
                     DiscordModel discordModel = new DiscordModel();
-                    discordModel.setContent(discordMessage + incomingRequest.getDeviceId());
+                    discordModel.setContent(discordMessage + incomingRequest.getSourcePlace());
                     requestService.markRequestAsSent(incomingRequest);
                     // Simulate sending the request
                     restTemplate.postForLocation(discordUrl, objectMapper.writeValueAsString(discordModel));
@@ -90,7 +90,7 @@ public class ScheduledRequestSender {
                     }
                     logger.info("Sented message");
                 }
-                requestService.deleteAllNotSended(incomingRequest.getDeviceId());
+                requestService.deleteAllNotSended(incomingRequest.getSourcePlace());
             }
         } else {
             logger.info("No unsent requests available.");

@@ -28,5 +28,5 @@ public class IncomingRequest {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @Column(name = "device_id")
-    private String deviceId;
+    private String sourcePlace;
 }

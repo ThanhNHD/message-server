@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class DeleteDeviceServices {
-    private String deviceIp;
+    private String sourcePlace;
     private String password;
 }

@@ -20,10 +20,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.AddDeviceReq;
+import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.AddSourceReq;
 import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.DeleteDeviceServices;
-import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.Devices;
-import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.GetAllDevicesIp;
+import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.DetectionSource;
+import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.GetAllSource;
 import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Control.StartDetectServerRequest;
 import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Model.Message.CommonResponse;
 import com.thesis.fpt.nguyenhuuducthanh23MSE23117.Service.DeviceManageService;
@@ -62,29 +62,30 @@ public class DevicesManageController {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping("/all")
-    public ResponseEntity<List<Devices>> getAllDevice(@RequestBody GetAllDevicesIp request) {
-        List<Devices> devices = new ArrayList<>();
+    public ResponseEntity<List<DetectionSource>> getAllSource(@RequestBody GetAllSource request) {
+        List<DetectionSource> sources = new ArrayList<>();
         try {
             if (request.getPassword().equals(serverPassword))
-                devices = deviceManageService.getAll();
+                sources = deviceManageService.getAll();
             else
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        return new ResponseEntity<>(devices, HttpStatus.OK);
+        logger.info(sources.toString());
+        return new ResponseEntity<>(sources, HttpStatus.OK);
     }
 
     @PostMapping("/startServies")
     public ResponseEntity<String> startServices() throws JsonProcessingException {
         String returnString = "";
         try {
-            List<Devices> devices = deviceManageService.getAll();
+            List<DetectionSource> devices = deviceManageService.getAll();
             StartDetectServerRequest startDetectServerRequest = new StartDetectServerRequest();
-            for (Devices devices2 : devices) {
-                startDetectServerRequest.getRtsp_urls().add(devices2.getDeviceConnection());
+            for (DetectionSource devices2 : devices) {
+                startDetectServerRequest.getSourcePlace().add(devices2.getSourcePlace());
             }
-            startDetectServerRequest.setServer_url(serverAddress + "/api/requests/save");
+            startDetectServerRequest.setServerMessageUrl(serverAddress + "/api/requests/save");
             returnString = restTemplate.postForEntity(detectServerStartAddress, startDetectServerRequest, String.class)
                     .getBody();
         } catch (Exception e) {
@@ -113,11 +114,11 @@ public class DevicesManageController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<CommonResponse> saveDevice(@RequestBody AddDeviceReq request) {
+    public ResponseEntity<CommonResponse> saveDevice(@RequestBody AddSourceReq request) {
         CommonResponse commonResponse = new CommonResponse();
         try {
             if (request.getPassword().equals(serverPassword)) {
-                if (deviceManageService.saveDevice(request.getData())) {
+                if (deviceManageService.saveSource(request.getData())) {
                     commonResponse.setCode("200");
                     commonResponse.setMessage("success");
                     return new ResponseEntity<>(commonResponse, HttpStatus.OK);
@@ -140,7 +141,7 @@ public class DevicesManageController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<CommonResponse> updateDevice(@RequestBody Devices request) {
+    public ResponseEntity<CommonResponse> updateDevice(@RequestBody DetectionSource request) {
         CommonResponse commonResponse = new CommonResponse();
         try {
             deviceManageService.updateDevice(request);
@@ -155,11 +156,11 @@ public class DevicesManageController {
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<CommonResponse> deleteDevice(@RequestBody DeleteDeviceServices request) {
+    public ResponseEntity<CommonResponse> deleteSource(@RequestBody DeleteDeviceServices request) {
         CommonResponse commonResponse = new CommonResponse();
         try {
             if (request.getPassword().equals(serverPassword)) {
-                if (deviceManageService.deleteDevice(request.getDeviceIp())) {
+                if (deviceManageService.deleteSource(request.getSourcePlace())) {
                     commonResponse.setCode("200");
                     commonResponse.setMessage("success");
                     return new ResponseEntity<>(commonResponse, HttpStatus.OK);

@@ -9,13 +9,13 @@ import lombok.Data;
 
 @Entity(name = "device")
 @Data
-public class Devices {
+public class DetectionSource {
      @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @Column(name = "device_connection_ip")
-    private String deviceConnection;
+    private String sourcePlace;
     @Column(name = "username")
     private String username;
     @Column(name = "password")
